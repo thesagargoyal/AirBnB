@@ -1,8 +1,7 @@
 package com.airBnb.AirBnB.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -16,6 +15,9 @@ import java.time.LocalDateTime;
 @Table(uniqueConstraints = @UniqueConstraint(
         name = "unique_hotel_room_date", columnNames = {"hotel_id", "room_id", "date"}
 ))
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Inventory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
