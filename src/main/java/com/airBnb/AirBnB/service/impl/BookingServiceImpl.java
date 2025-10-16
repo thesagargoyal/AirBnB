@@ -6,6 +6,7 @@ import com.airBnb.AirBnB.dto.GuestDto;
 import com.airBnb.AirBnB.entity.*;
 import com.airBnb.AirBnB.entity.enums.BookingStatus;
 import com.airBnb.AirBnB.exception.ResourceNotFoundException;
+import com.airBnb.AirBnB.exception.UnauthorizedException;
 import com.airBnb.AirBnB.repository.*;
 import com.airBnb.AirBnB.service.BookingService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+
+import static com.airBnb.AirBnB.util.AppUtils.getCurrentUser;
 
 @Service
 @RequiredArgsConstructor
@@ -87,6 +90,12 @@ public class BookingServiceImpl implements BookingService {
                         () -> new ResourceNotFoundException("Booking not found with id: " + bookingId)
                 );
 
+        User user = getCurrentUser();
+
+        if(!user.equals(booking.getUser())) {
+            throw new UnauthorizedException("Booking doesn't belong to user with id : " + user.getId());
+        }
+
         if (hasBookingExpired(booking)) {
             throw new IllegalStateException("Booking has expired");
         }
@@ -97,7 +106,7 @@ public class BookingServiceImpl implements BookingService {
 
         for (GuestDto guestDto : guestsList) {
             Guest guest = modelMapper.map(guestDto, Guest.class);
-            guest.setUser(getCurrentUser());
+            guest.setUser(user );
             guest = guestRepository.save(guest);
             booking.getGuests().add(guest);
         }
@@ -113,11 +122,5 @@ public class BookingServiceImpl implements BookingService {
                 .getCreatedAt()
                 .plusMinutes(10)
                 .isBefore(LocalDateTime.now());
-    }
-
-    public User getCurrentUser() {
-        User user = new User();
-        user.setUserId(1L);
-        return user;
     }
 }
