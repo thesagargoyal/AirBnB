@@ -34,7 +34,7 @@ public class AuthService {
             throw new RuntimeException("User already exists with email: " + signUpRequestDto.getEmail());
         }
         User newUser = modelMapper.map(signUpRequestDto, User.class);
-        newUser.setRoles(Set.of(Role.GUEST));
+        newUser.setRoles(Set.of(Role.HOTEL_MANAGER));
         newUser.setPassword(passwordEncoder.encode(signUpRequestDto.getPassword()));
         newUser = userRepository.save(newUser);
         return modelMapper.map(newUser, UserDto.class);
