@@ -13,6 +13,7 @@ import com.airBnb.AirBnB.service.InventoryService;
 import com.airBnb.AirBnB.service.RoomService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -101,5 +102,27 @@ public class RoomServiceImpl implements RoomService {
         // Delete future Inventory for this room
         inventoryService.deleteAllInventories(room);
         roomRepository.deleteById(roomId);
+    }
+
+    @Override
+    public RoomDto updateRoomById(Long hotelId, Long roomId, RoomDto roomDto) {
+        Hotel hotel = hotelRepository
+                .findById(hotelId)
+                .orElseThrow(() -> new ResourceNotFoundException("Hotel not found with id: "+hotelId));
+
+        User user = getCurrentUser();
+
+        if(!user.equals(hotel.getOwner())) {
+            throw new AccessDeniedException("This user of id " + user.getId() + " is not owner of this hotel");
+        }
+        Room room = roomRepository
+                .findById(roomId)
+                .orElseThrow(() -> new ResourceNotFoundException("Room not found with id: "+roomId));
+
+        modelMapper.map(roomDto, room);
+        room.setId(roomId);
+
+        // TODO: Update inventory if price and room count is upated
+        return modelMapper.map(roomRepository.save(room), RoomDto.class);
     }
 }

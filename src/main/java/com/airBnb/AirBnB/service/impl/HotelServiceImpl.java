@@ -1,13 +1,16 @@
 package com.airBnb.AirBnB.service.impl;
 
+import com.airBnb.AirBnB.dto.BookingDto;
 import com.airBnb.AirBnB.dto.HotelDto;
 import com.airBnb.AirBnB.dto.HotelInfoDto;
 import com.airBnb.AirBnB.dto.RoomDto;
+import com.airBnb.AirBnB.entity.Booking;
 import com.airBnb.AirBnB.entity.Hotel;
 import com.airBnb.AirBnB.entity.Room;
 import com.airBnb.AirBnB.entity.User;
 import com.airBnb.AirBnB.exception.ResourceNotFoundException;
 import com.airBnb.AirBnB.exception.UnauthorizedException;
+import com.airBnb.AirBnB.repository.BookingRepository;
 import com.airBnb.AirBnB.repository.HotelRepository;
 import com.airBnb.AirBnB.repository.RoomRepository;
 import com.airBnb.AirBnB.service.HotelService;
@@ -32,6 +35,7 @@ public class HotelServiceImpl implements HotelService {
     private final ModelMapper modelMapper;
     private final InventoryService inventoryService;
     private final RoomRepository roomRepository;
+    private final BookingRepository bookingRepository;
 
     @Override
     public HotelDto createNewHotel(HotelDto hotelDto) {
@@ -134,5 +138,11 @@ public class HotelServiceImpl implements HotelService {
         return new HotelInfoDto(modelMapper.map(hotel, HotelDto.class), rooms);
     }
 
+    @Override
+    public List<HotelDto> getAllHotels() {
+        User user = getCurrentUser();
+        List<Hotel> hotels = hotelRepository.findHotelsByOwner(user);
+        return hotels.stream().map(hotel -> modelMapper.map(hotel, HotelDto.class)).collect(Collectors.toList());
+    }
 
 }

@@ -1,5 +1,6 @@
 package com.airBnb.AirBnB.repository;
 
+import com.airBnb.AirBnB.dto.InventoryDto;
 import com.airBnb.AirBnB.entity.Hotel;
 import com.airBnb.AirBnB.entity.Inventory;
 import com.airBnb.AirBnB.entity.Room;
@@ -12,7 +13,9 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 
 public interface InventoryRepository extends JpaRepository<Inventory, Long> {
@@ -113,4 +116,30 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
                      @Param("startDate") LocalDate startDate,
                      @Param("endDate") LocalDate endDate,
                      @Param("numberOfRooms") int numberOfRooms);
+
+    List<InventoryDto> findByRoomOrderByDateDesc(Room room);
+
+    @Query("""
+                Select i from Inventory i
+                WHERE i.room.id = :roomId
+                  AND i.date BETWEEN :startDate AND :endDate
+            """)
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    List<Inventory> getInventoryAndLockBeforeUpdate(@Param("roomId") Long roomId,
+                                                    @Param("startDate") LocalDate startDate,
+                                                    @Param("endDate") LocalDate endDate );
+
+    @Modifying
+    @Query("""
+                UPDATE Inventory i
+                SET i.surgeFactor  = :surgeFactor,
+                    i.closed = :closed
+                WHERE i.room.id = :roomId
+                  AND i.date BETWEEN :startDate AND :endDate
+            """)
+    void updateInventory(@Param("roomId") Long roomId,
+                         @Param("startDate") LocalDate startDate,
+                         @Param("endDate") LocalDate endDate,
+                         @Param("closed") Boolean closed,
+                         @Param("surgeFactor") BigDecimal surgeFactor);
 }
