@@ -5,6 +5,7 @@ import com.airBnb.AirBnB.dto.LoginResponseDto;
 import com.airBnb.AirBnB.dto.SignUpRequestDto;
 import com.airBnb.AirBnB.dto.UserDto;
 import com.airBnb.AirBnB.service.impl.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -27,11 +28,13 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping(path = "/signup")
+    @Operation(summary = "Register a new user", tags = {"Authentication"})
     public ResponseEntity<UserDto> signUp(@RequestBody SignUpRequestDto signUpRequestDto) {
         return new ResponseEntity<>(authService.signUp(signUpRequestDto), HttpStatus.CREATED);
     }
 
     @PostMapping(path = "/login")
+    @Operation(summary = "Login with credentials", tags = {"Authentication"})
     public ResponseEntity<LoginResponseDto> login(@RequestBody LoginDto loginDto, HttpServletRequest request, HttpServletResponse response) {
         String[] tokens =  authService.login(loginDto);
 
@@ -44,6 +47,7 @@ public class AuthController {
     }
 
     @PostMapping(path = "/refresh")
+    @Operation(summary = "Refresh access token using refresh token", tags = {"Authentication"})
     public ResponseEntity<LoginResponseDto> refresh(HttpServletRequest request) {
         String refreshToken = Arrays.stream(request.getCookies())
                 .filter(cookie -> "refreshToken".equals(cookie.getName()))
