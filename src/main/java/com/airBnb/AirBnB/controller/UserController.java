@@ -34,7 +34,7 @@ public class UserController {
     @GetMapping("/myBookings")
     @Operation(summary = "Get current user booking", tags = {"Profile Management"})
     public ResponseEntity<List<BookingDto>> getMyBookings() {
-        return ResponseEntity.ok(bookingService.geyMyBookings());
+        return ResponseEntity.ok(bookingService.getMyBookings());
     }
 
     @GetMapping("/profile")
@@ -62,7 +62,7 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("guests/{guestId}")
+    @DeleteMapping("/guests/{guestId}")
     @Operation(summary = "Delete a guest", tags = {"Guest Management"})
     public ResponseEntity<Void> deleteGuest(@PathVariable Long guestId) {
         guestService.deleteGuest(guestId);

@@ -26,5 +26,5 @@ public interface BookingService {
 
     HotelReportDto generateHotelReport(Long hotelId, LocalDate startDate, LocalDate endDate);
 
-    List<BookingDto> geyMyBookings();
+    List<BookingDto> getMyBookings();
 }

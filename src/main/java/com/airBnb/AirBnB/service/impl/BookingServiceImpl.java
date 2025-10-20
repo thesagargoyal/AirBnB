@@ -297,7 +297,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> geyMyBookings() {
+    public List<BookingDto> getMyBookings() {
         User user = getCurrentUser();
 
         return bookingRepository
